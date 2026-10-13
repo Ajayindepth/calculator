@@ -3,141 +3,337 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sample Size & Confidence Calculator</title>
-    <!-- Tailwind CSS for sleek styling -->
-    <script src="https://jsdelivr.net"></script>
+    <title>Probability & Statistics Dashboard</title>
     <style>
-        /* Custom subtle styling for a clean premium card look */
-        .slider-thumb::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #3b82f6;
-            cursor: pointer;
-            transition: background 0.15s ease-in-out;
+        body {
+            background-color: #f1f5f9;
+            color: #334155;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
         }
-        .slider-thumb::-webkit-slider-thumb:hover {
-            background: #2563eb;
+        .main-container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .main-title {
+            font-size: 28px;
+            color: #0f172a;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+        .full-row-section {
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 35px;
+        }
+        .section-title {
+            font-size: 22px;
+            color: #0f172a;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .flex-split {
+            display: flex;
+            gap: 30px;
+        }
+        .info-side {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .control-side {
+            flex: 1;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .input-row {
+            margin-bottom: 18px;
+        }
+        .input-row label {
+            display: block;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+        .value-readout {
+            color: #2563eb;
+            font-weight: bold;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+        select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        .score-box {
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            margin-top: 15px;
+        }
+        .score-box-indigo {
+            background-color: #f5f3ff;
+            border: 1px solid #e0e7ff;
+        }
+        .score-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: #64748b;
+            display: block;
+        }
+        .score-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1e3a8a;
+            display: block;
+            margin: 5px 0;
+        }
+        .score-number-indigo {
+            color: #312e81;
+        }
+        .sub-badge {
+            font-size: 12px;
+            color: #475569;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 6px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        /* Debug Console Panel Box */
+        .debug-panel {
+            background-color: #1e1e1e;
+            color: #ef4444;
+            font-family: monospace;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 12px;
+            display: block;
+            border-left: 4px solid #dc2626;
+        }
+        .debug-ok {
+            color: #10b981 !important;
+            border-left-color: #059669 !important;
+        }
+        @media (max-width: 768px) {
+            .flex-split { flex-direction: column; }
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex items-center justify-center p-4">
+<body>
 
-    <div class="bg-white shadow-xl rounded-2xl max-w-md w-full p-6 border border-slate-100">
-        <!-- Header -->
-        <div class="mb-6">
-            <h1 class="text-xl font-bold text-slate-900">Sample Size Calculator</h1>
-            <p class="text-sm text-slate-500 mt-1">Determine how many experimental trials are required based on the Law of Large Numbers.</p>
-        </div>
+    <div class="main-container">
+        <h1 class="main-title">Probability & Mathematical Statistics Suite</h1>
 
-        <!-- Controls -->
-        <div class="space-y-5">
-            <!-- Confidence Level -->
-            <div>
-                <label for="confidence" class="block text-sm font-semibold text-slate-700 mb-2">
-                    Confidence Level: <span id="confidenceVal" class="text-blue-600 font-bold">95</span>%
-                </label>
-                <select id="confidence" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="1.645">90% (Z = 1.645)</option>
-                    <option value="1.96" selected>95% (Z = 1.96) - Standard</option>
-                    <option value="2.576">99% (Z = 2.576)</option>
-                </select>
-            </div>
-
-            <!-- Margin of Error -->
-            <div>
-                <div class="flex justify-between text-sm font-semibold text-slate-700 mb-1">
-                    <label for="error">Margin of Error (ε):</label>
-                    <span class="text-blue-600 font-bold"><span id="errorVal">5.0</span>%</span>
+        <!-- STEP 1 (TOP): SAMPLE SIZE CALCULATOR -->
+        <div class="full-row-section">
+            <h2 class="section-title">🎯 Step 1: Law of Large Numbers Sample Size</h2>
+            <div class="flex-split">
+                <div class="info-side">
+                    <p>According to the Law of Large Numbers, experimental measurements stabilize and match true parameters only given enough baseline sample size data points.</p>
+                    <p style="margin-top:10px;">Use this system first to compute exactly how many times an experiment must be run to hit a desired target window of error precision with a specified level of statistical confidence.</p>
                 </div>
-                <input type="range" id="error" min="0.5" max="15" step="0.1" value="5.0" 
-                       class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600 slider-thumb">
-                <div class="flex justify-between text-xs text-slate-400 mt-1">
-                    <span>0.5% (High Precision)</span>
-                    <span>15%</span>
-                </div>
-            </div>
+                
+                <div class="control-side">
+                    <div class="input-row">
+                        <label>Confidence Level Target:</label>
+                        <select id="pickZ">
+                            <option value="1.645">90% Confidence (Z = 1.645)</option>
+                            <option value="1.96" selected>95% Confidence (Z = 1.96)</option>
+                            <option value="2.576">99% Confidence (Z = 2.576)</option>
+                        </select>
+                    </div>
+                    <div class="input-row">
+                        <label>Target Margin of Error (ε): <span id="lblErr" class="value-readout">5.0</span>%</label>
+                        <input type="range" id="scaleErr" min="0.5" max="15" step="0.1" value="5.0">
+                    </div>
+                    <div class="input-row">
+                        <label>Estimated True Baseline (p): <span id="lblSamP" class="value-readout">50</span>%</label>
+                        <input type="range" id="scaleSamP" min="5" max="95" step="1" value="50">
+                    </div>
 
-            <!-- Baseline Probability -->
-            <div>
-                <div class="flex justify-between text-sm font-semibold text-slate-700 mb-1">
-                    <label for="probability">Estimated True Probability (p):</label>
-                    <span class="text-blue-600 font-bold"><span id="probVal">50</span>%</span>
-                </div>
-                <input type="range" id="probability" min="5" max="95" step="1" value="50" 
-                       class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600 slider-thumb">
-                <div class="flex justify-between text-xs text-slate-400 mt-1">
-                    <span>5%</span>
-                    <span>50% (Worst Case)</span>
-                    <span>95%</span>
+                    <div class="score-box">
+                        <span class="score-label">Required Sizing Volume</span>
+                        <span id="outSample" class="score-number">385</span>
+                        <span style="font-size:12px; color:#2563eb; display:block;">minimum clean trials required</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Result Display -->
-        <div class="mt-8 bg-blue-50 rounded-xl p-5 border border-blue-100 text-center">
-            <span class="block text-xs font-bold text-blue-500 uppercase tracking-wider mb-1">Required Sample Size</span>
-            <span id="resultTrials" class="text-4xl font-extrabold text-blue-900">385</span>
-            <span class="block text-xs text-blue-600 mt-2 font-medium">minimum consecutive trials needed</span>
+        <!-- STEP 2 (BOTTOM): STREAK PROBABILITY -->
+        <div class="full-row-section">
+            <h2 class="section-title">📈 Step 2: Streak Consecutive Runs Probability</h2>
+            <div class="flex-split">
+                <div class="info-side">
+                    <p>Once you know your required total experiment sample size, this engine determines the probability of hitting a specific run of consecutive heads at least once during those total trials.</p>
+                    <p style="margin-top:10px;"><strong>What to watch:</strong> Notice how a small adjustment to the coin bias slider causes the overall streak probability to jump drastically over your trial volume. This shows how minor advantages compound exponentially over time.</p>
+                </div>
+                
+                <div class="control-side">
+                    <div class="input-row">
+                        <label>Total Tosses (N): <span id="lblN" class="value-readout">500</span></label>
+                        <input type="range" id="scaleN" min="10" max="1500" step="10" value="500">
+                    </div>
+                    <div class="input-row">
+                        <label>Target Streak Length (n): <span id="lblRun" class="value-readout">10</span></label>
+                        <input type="range" id="scaleRun" min="2" max="50" step="1" value="10">
+                    </div>
+                    <div class="input-row">
+                        <label>Probability of a Head (p): <span id="lblP" class="value-readout">50</span>%</label>
+                        <input type="range" id="scaleP" min="5" max="95" step="1" value="50">
+                    </div>
+
+                    <div class="score-box score-box-indigo">
+                        <span class="score-label">Streak Probability</span>
+                        <span id="outStreak" class="score-number score-number-indigo">21.45%</span>
+                        <span class="sub-badge">Expected average attempts: <span id="outExpected" style="font-weight:bold;">2,046</span></span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Mathematical Hint Footnote -->
-        <p class="text-[11px] text-slate-400 text-center mt-4 italic">
-            Calculated via: N = [Z² × p(1-p)] / ε²
-        </p>
+        <!-- Diagnostic Output Log Panel -->
+        <div id="debugLog" class="debug-panel">
+            System status: Initializing scripts...
+        </div>
+
     </div>
 
-    <!-- Interactive App Logic -->
     <script>
-        // DOM Elements
-        const confidenceSelect = document.getElementById('confidence');
-        const confidenceVal = document.getElementById('confidenceVal');
-        
-        const errorInput = document.getElementById('error');
-        const errorVal = document.getElementById('errorVal');
-        
-        const probInput = document.getElementById('probability');
-        const probVal = document.getElementById('probVal');
-        
-        const resultTrials = document.getElementById('resultTrials');
-
-        // Mapping dictionary to update header label display cleanly
-        const zToPercentMap = {
-            "1.645": "90",
-            "1.96": "95",
-            "2.576": "99"
+        // Universal diagnostic error wrapper
+        window.onerror = function(message, source, lineno, colno, error) {
+            var log = document.getElementById('debugLog');
+            if (log) {
+                log.classList.remove('debug-ok');
+                log.innerHTML = "<strong>⚠️ JavaScript Execution Error:</strong><br>" + 
+                                "Message: " + message + "<br>" +
+                                "Line: " + lineno + ", Column: " + colno;
+            }
+            return false;
         };
 
-        // Calculation Function
-        function calculateSampleSize() {
-            const z = parseFloat(confidenceSelect.value);
-            const error = parseFloat(errorInput.value) / 100; // Convert whole percentage number to decimal
-            const p = parseFloat(probInput.value) / 100;     // Convert whole percentage number to decimal
+        // Execution Logic Scope
+        document.addEventListener('DOMContentLoaded', function() {
+            var elemN, elemRun, elemP, txtN, txtRun, txtP, viewStreak, viewExpected;
+            var elemZ, elemErr, elemSamP, txtErr, txtSamP, viewSample;
+            var debugLog = document.getElementById('debugLog');
 
-            // Update visible label readouts dynamically
-            confidenceVal.textContent = zToPercentMap[confidenceSelect.value];
-            errorVal.textContent = (error * 100).toFixed(1);
-            probVal.textContent = (p * 100);
+            function initElements() {
+                elemN = document.getElementById('scaleN');
+                elemRun = document.getElementById('scaleRun');
+                elemP = document.getElementById('scaleP');
+                txtN = document.getElementById('lblN');
+                txtRun = document.getElementById('lblRun');
+                txtP = document.getElementById('lblP');
+                viewStreak = document.getElementById('outStreak');
+                viewExpected = document.getElementById('outExpected');
 
-            // Compute standard sample size equation: N = (Z^2 * p * (1-p)) / error^2
-            const nRaw = (Math.pow(z, 2) * p * (1 - p)) / Math.pow(error, 2);
-            
-            // Always round up to the next full experiment/person (Ceil)
-            const nFinal = Math.ceil(nRaw);
+                elemZ = document.getElementById('pickZ');
+                elemErr = document.getElementById('scaleErr');
+                elemSamP = document.getElementById('scaleSamP');
+                txtErr = document.getElementById('lblErr');
+                txtSamP = document.getElementById('lblSamP');
+                viewSample = document.getElementById('outSample');
+            }
 
-            // Render output to user formatted nicely with commas
-            resultTrials.textContent = nFinal.toLocaleString();
-        }
+            // Step 1: Sample Size Calculation
+            function calculateSampleSize() {
+                var z = parseFloat(elemZ.value);
+                var e = parseFloat(elemErr.value) / 100;
+                var p = parseFloat(elemSamP.value) / 100;
 
-        // Attach real-time structural event listeners
-        confidenceSelect.addEventListener('change', calculateSampleSize);
-        errorInput.addEventListener('input', calculateSampleSize);
-        probInput.addEventListener('input', calculateSampleSize);
+                txtErr.textContent = elemErr.value;
+                txtSamP.textContent = elemSamP.value;
 
-        // Run initial configuration update right out of the gate
-        calculateSampleSize();
+                var n = (Math.pow(z, 2) * p * (1 - p)) / Math.pow(e, 2);
+                viewSample.textContent = Math.ceil(n).toLocaleString();
+            }
+
+            // Step 2: Consecutive Streak Calculation using Markov Chain approach
+            function calculateStreak() {
+                var N = parseInt(elemN.value, 10);
+                var k = parseInt(elemRun.value, 10);
+                var p = parseFloat(elemP.value) / 100;
+                var q = 1 - p;
+
+                txtN.textContent = N;
+                txtRun.textContent = k;
+                txtP.textContent = elemP.value;
+
+                // Expected attempts calculation
+                var expected = (1 - Math.pow(p, k)) / (q * Math.pow(p, k));
+                viewExpected.textContent = Math.round(expected).toLocaleString();
+
+                // Dynamic programming for exact streak probability over N tosses
+                if (k > N) {
+                    viewStreak.textContent = "0.00%";
+                    return;
+                }
+
+                var dp = new Array(k).fill(0);
+                dp[0] = 1;
+
+                for (var step = 0; step < N; step++) {
+                    var nextDp = new Array(k).fill(0);
+                    for (var state = 0; state < k; state++) {
+                        if (dp[state] > 0) {
+                            // On fail (tail)
+                            nextDp[0] += dp[state] * q;
+                            // On success (head)
+                            if (state + 1 < k) {
+                                nextDp[state + 1] += dp[state] * p;
+                            }
+                        }
+                    }
+                    dp = nextDp;
+                }
+
+                var probNoStreak = dp.reduce(function(a, b) { return a + b; }, 0);
+                var probStreak = Math.max(0, Math.min(1, 1 - probNoStreak));
+
+                viewStreak.textContent = (probStreak * 100).toFixed(2) + "%";
+            }
+
+            function updateAll() {
+                calculateSampleSize();
+                calculateStreak();
+            }
+
+            function attachEvents() {
+                var inputs = [elemN, elemRun, elemP, elemZ, elemErr, elemSamP];
+                inputs.forEach(function(input) {
+                    input.addEventListener('input', updateAll);
+                    input.addEventListener('change', updateAll);
+                });
+            }
+
+            initElements();
+            attachEvents();
+            updateAll();
+
+            // Mark System as OK
+            debugLog.classList.add('debug-ok');
+            debugLog.innerHTML = "<strong>✅ System status:</strong> Engine active and running.";
+        });
     </script>
 </body>
 </html>
