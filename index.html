@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sample Size & Confidence Calculator</title>
+    <!-- Tailwind CSS for sleek styling -->
+    <script src="https://jsdelivr.net"></script>
+    <style>
+        /* Custom subtle styling for a clean premium card look */
+        .slider-thumb::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            transition: background 0.15s ease-in-out;
+        }
+        .slider-thumb::-webkit-slider-thumb:hover {
+            background: #2563eb;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white shadow-xl rounded-2xl max-w-md w-full p-6 border border-slate-100">
+        <!-- Header -->
+        <div class="mb-6">
+            <h1 class="text-xl font-bold text-slate-900">Sample Size Calculator</h1>
+            <p class="text-sm text-slate-500 mt-1">Determine how many experimental trials are required based on the Law of Large Numbers.</p>
+        </div>
+
+        <!-- Controls -->
+        <div class="space-y-5">
+            <!-- Confidence Level -->
+            <div>
+                <label for="confidence" class="block text-sm font-semibold text-slate-700 mb-2">
+                    Confidence Level: <span id="confidenceVal" class="text-blue-600 font-bold">95</span>%
+                </label>
+                <select id="confidence" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="1.645">90% (Z = 1.645)</option>
+                    <option value="1.96" selected>95% (Z = 1.96) - Standard</option>
+                    <option value="2.576">99% (Z = 2.576)</option>
+                </select>
+            </div>
+
+            <!-- Margin of Error -->
+            <div>
+                <div class="flex justify-between text-sm font-semibold text-slate-700 mb-1">
+                    <label for="error">Margin of Error (ε):</label>
+                    <span class="text-blue-600 font-bold"><span id="errorVal">5.0</span>%</span>
+                </div>
+                <input type="range" id="error" min="0.5" max="15" step="0.1" value="5.0" 
+                       class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600 slider-thumb">
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                    <span>0.5% (High Precision)</span>
+                    <span>15%</span>
+                </div>
+            </div>
+
+            <!-- Baseline Probability -->
+            <div>
+                <div class="flex justify-between text-sm font-semibold text-slate-700 mb-1">
+                    <label for="probability">Estimated True Probability (p):</label>
+                    <span class="text-blue-600 font-bold"><span id="probVal">50</span>%</span>
+                </div>
+                <input type="range" id="probability" min="5" max="95" step="1" value="50" 
+                       class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600 slider-thumb">
+                <div class="flex justify-between text-xs text-slate-400 mt-1">
+                    <span>5%</span>
+                    <span>50% (Worst Case)</span>
+                    <span>95%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Display -->
+        <div class="mt-8 bg-blue-50 rounded-xl p-5 border border-blue-100 text-center">
+            <span class="block text-xs font-bold text-blue-500 uppercase tracking-wider mb-1">Required Sample Size</span>
+            <span id="resultTrials" class="text-4xl font-extrabold text-blue-900">385</span>
+            <span class="block text-xs text-blue-600 mt-2 font-medium">minimum consecutive trials needed</span>
+        </div>
+
+        <!-- Mathematical Hint Footnote -->
+        <p class="text-[11px] text-slate-400 text-center mt-4 italic">
+            Calculated via: N = [Z² × p(1-p)] / ε²
+        </p>
+    </div>
+
+    <!-- Interactive App Logic -->
+    <script>
+        // DOM Elements
+        const confidenceSelect = document.getElementById('confidence');
+        const confidenceVal = document.getElementById('confidenceVal');
+        
+        const errorInput = document.getElementById('error');
+        const errorVal = document.getElementById('errorVal');
+        
+        const probInput = document.getElementById('probability');
+        const probVal = document.getElementById('probVal');
+        
+        const resultTrials = document.getElementById('resultTrials');
+
+        // Mapping dictionary to update header label display cleanly
+        const zToPercentMap = {
+            "1.645": "90",
+            "1.96": "95",
+            "2.576": "99"
+        };
+
+        // Calculation Function
+        function calculateSampleSize() {
+            const z = parseFloat(confidenceSelect.value);
+            const error = parseFloat(errorInput.value) / 100; // Convert whole percentage number to decimal
+            const p = parseFloat(probInput.value) / 100;     // Convert whole percentage number to decimal
+
+            // Update visible label readouts dynamically
+            confidenceVal.textContent = zToPercentMap[confidenceSelect.value];
+            errorVal.textContent = (error * 100).toFixed(1);
+            probVal.textContent = (p * 100);
+
+            // Compute standard sample size equation: N = (Z^2 * p * (1-p)) / error^2
+            const nRaw = (Math.pow(z, 2) * p * (1 - p)) / Math.pow(error, 2);
+            
+            // Always round up to the next full experiment/person (Ceil)
+            const nFinal = Math.ceil(nRaw);
+
+            // Render output to user formatted nicely with commas
+            resultTrials.textContent = nFinal.toLocaleString();
+        }
+
+        // Attach real-time structural event listeners
+        confidenceSelect.addEventListener('change', calculateSampleSize);
+        errorInput.addEventListener('input', calculateSampleSize);
+        probInput.addEventListener('input', calculateSampleSize);
+
+        // Run initial configuration update right out of the gate
+        calculateSampleSize();
+    </script>
+</body>
+</html>
